@@ -2,6 +2,7 @@ import os
 import boto3
 import time
 import requests
+import json
 
 def main():
     aws_region = os.environ['AWS_REGION']
@@ -12,6 +13,8 @@ def main():
 
     # Create an SQS client. If region is not provided here, 
     # make sure it's set in your AWS config.
+    print(f"Creating boto3 sqs client in region: {aws_region}")
+
     sqs = boto3.client('sqs', region_name=aws_region)
 
     # Replace with your actual SQS Queue URL
@@ -36,8 +39,10 @@ def main():
 
             # Process each message
             for message in messages:
-                body = message['Body']
                 receipt_handle = message['ReceiptHandle']
+                body = json.loads(message['Body'])
+                body_message = json.loads(body['Message'])
+                repository = body_message['repository']
 
                 # Do something with the message
                 print(f"Received message: {body}")
